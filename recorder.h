@@ -14,6 +14,14 @@ class MT_INT16{};
 class MT_INT8{};
 class MT_UINT8{};
 
+struct RecordeInfo
+{
+	unsigned int seconds;
+	unsigned int channels;
+	unsigned int sampleRate;
+	unsigned int sampleBits;
+};
+
 class CRecoder{
 	friend class CRecordPlayer;
 private:
@@ -29,12 +37,13 @@ private:
 	//void _PrintMaxAndAver( MT_UINT8 );
 private:
 	unsigned int m_seconds;		//录音的时长
-	static unsigned int m_recordBits;
 	paTestData m_recordData;	//录音的数据以及一些信息
 	PaStream*	m_stream;
+	RecordeInfo m_recordInfo;
 public:
 	//CRecoder();
 	CRecoder( int seconds = 5 );
+	CRecoder( const RecordeInfo& info );
 	//CRecoder( const RecordeInfo& info, FLOAT32 );
 	//CRecoder( const RecordeInfo& info, INT16 );
 	//CRecoder( const RecordeInfo& info, INT8 );
@@ -66,6 +75,16 @@ public:
 	* @brief : 录音的回调函数 
 	*/
 	static int recordCallback(
+		const void *inputBuffer, void *outputBuffer,
+		unsigned long framesPerBuffer,
+		const PaStreamCallbackTimeInfo* timeInfo,
+		PaStreamCallbackFlags statusFlags,
+		void *userData);
+
+	/**
+	* @brief : 32bits 录音的回调函数 
+	*/
+	static int recordCallback32Bits(
 		const void *inputBuffer, void *outputBuffer,
 		unsigned long framesPerBuffer,
 		const PaStreamCallbackTimeInfo* timeInfo,

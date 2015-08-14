@@ -38,16 +38,10 @@ typedef struct
 	int          frameIndex;  /* Index into sample array. */
 	int          maxFrameIndex;
 	unsigned int totalBytes;
-	SAMPLE         *recordedSamples;
+	SAMPLE       *recordedSamples;
 }
 paTestData;
 
-struct RecordeInfo
-{
-	unsigned int channels;
-	unsigned int sampleRate;
-	unsigned int seconds;
-};
 
 typedef struct Waves{
 	SAMPLE waveData[FRAME_PER_BUFFER*CHANNEL_COUNT];

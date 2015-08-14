@@ -2,7 +2,7 @@
 #include <string>
 
 
-unsigned int CRecoder::m_recordBits = 0;
+
 
 CRecoder::CRecoder( int seconds/*5*/ ):m_seconds(seconds)
 {
@@ -11,6 +11,31 @@ CRecoder::CRecoder( int seconds/*5*/ ):m_seconds(seconds)
 	m_recordData.totalBytes = m_recordData.maxFrameIndex*CHANNEL_COUNT * sizeof(SAMPLE);
 	m_recordData.recordedSamples = (SAMPLE*)malloc(m_recordData.totalBytes );
 	m_stream = NULL;
+}
+
+CRecoder::CRecoder( const RecordeInfo& info ):m_recordInfo(info)
+{
+	m_stream = NULL;
+	m_recordData.frameIndex		= 0;
+	m_recordData.maxFrameIndex  = m_recordInfo.seconds * m_recordInfo.sampleRate;
+	m_recordData.totalBytes		= m_recordData.maxFrameIndex *
+								  m_recordInfo.channels * m_recordInfo.sampleBits;
+
+	switch( m_recordInfo.sampleBits )
+	{
+	//case 32:
+	//	m_recordData.recordedSamples = (float*)malloc( m_recordData.totalBytes );
+	//	break;
+	//case 16:
+	//	m_recordData.recordedSamples = (short*)malloc( m_recordData.totalBytes );
+	//	break;
+	//case 8:
+	//	m_recordData.recordedSamples = (short*)malloc( m_recordData.totalBytes );
+	//	break;
+	//default:
+		m_recordData.recordedSamples = (float*)malloc( m_recordData.totalBytes );
+		break;
+	}
 }
 
 //CRecoder::CRecoder( const RecordeInfo& info, FLOAT32 )
@@ -279,10 +304,7 @@ int CRecoder::recordCallback(const void *inputBuffer,
 	const SAMPLE *rptr = (const SAMPLE*)inputBuffer;
 	SAMPLE *wptr = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT];
 
-	long framesToCalc;
-	long i;
-	int finished;
-	unsigned long framesLeft = data->maxFrameIndex - data->frameIndex;
+
 
 	(void) outputBuffer; /* Prevent unused variable warnings. */
 	(void) timeInfo;
@@ -320,4 +342,15 @@ int CRecoder::recordCallback(const void *inputBuffer,
 	}
 	data->frameIndex += framesToCalc;
 	return finished;
+}
+
+
+static int recordCallback32Bits(
+	const void *inputBuffer, void *outputBuffer,
+	unsigned long framesPerBuffer,
+	const PaStreamCallbackTimeInfo* timeInfo,
+	PaStreamCallbackFlags statusFlags,
+	void *userData)
+{
+
 }
