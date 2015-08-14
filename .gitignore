@@ -1,0 +1,10 @@
+*.raw
+*.obj
+*.tlog
+*.rc
+*.mainifest
+*.res
+*.log
+*.rc
+*.idb
+*.pdb
