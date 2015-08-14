@@ -1,30 +1,31 @@
 #include "record_Save_Process_PlayHeader.h"
-#include "recorder.h"
+#include "record.h"
 #include "processer.h"
+#include "recordPlayer.h"
 
-#define SECONDS 3
+#define SECONDS 1
 
 int main()
 {
-	const char *url = "recorded.raw";
-	CRecoder recoder( SECONDS );
-	recoder.Init();
-	recoder.StartRecode();
+	RecordeInfo rcinfo;
+	rcinfo.channels			= 1;
+	rcinfo.framesPerBuffer	= 512;
+	rcinfo.sampleType		= SAMPLE_TYPE_FLOAT32;
+	rcinfo.sampleRate		= 44100;
+	rcinfo.seconds			= 1;
 
+	CRecorder recorder( rcinfo );
+	recorder.StartRecord();
+//	recorder.SavePcm2File( "pcm_2_44100_float_5" );
 
 
 
 	unsigned int bufferSize;
 	CProcesser pro;
-
-	//pro.Pcm2Wav( (float*)recoder.GetRecordData(), bufferSize, info );
-	
-
-	//Processer
-	//......
-
-	//float* out = pro.TimeScaling( 0.3, (float*)recoder.GetRecordData(), recoder.GetRecordDataSize() );
-	float* out = pro.PitchShifting( 8, (float*)recoder.GetRecordData(), recoder.GetRecordDataSize() );
+	//变速处理
+	float* out = pro.TimeScaling( 0.3, (float*)recorder.GetData(), recorder.GetDataSize() );
+	//变调处理
+	//float* out = pro.PitchShifting( 8, (float*)recorder.GetData(), recorder.GetDataSize() );
 	bufferSize = pro.GetAfterScaleSize();
 
 	Pcm2WavInfo info;
@@ -33,27 +34,11 @@ int main()
 	info.inFileName = "";
 	info.outFileName= "out_1_16int_44100.wav";
 	info.sampleBits = 32;
-	info.sampleRate = 44100*pro.GetAfterPitchShitingSampleRate();
+	info.sampleRate = 44100;
 	pro.Pcm2Wav( out, bufferSize, info );
 
 	CRecordPlayer player( bufferSize, out );
 	player.Init();
 	player.StartPlay();
 
-	//bufferSize = pro.GetAfterScaleSize();
-	//Pcm2WavInfo info;
-	//info.channels	= 1;
-	//info.formatTag	= 3;
-	//info.sampleRate = 44100;
-	//info.sampleBits = 32;
-	//info.inFileName = "";
-	//info.outFileName= "out_1_16int_44100.wav";
-	//pro.Pcm2Wav( (const float*)out, bufferSize, info );
-
-	//unsigned long afterScaleSize = pro.GetAfterScaleSize();
-
-
-	//CRecordPlayer player( recoder );
-	//player.Init();
-	//player.StartPlay();
 }

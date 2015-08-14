@@ -20,8 +20,8 @@ float* CProcesser::TimeScaling( float scale,float* buffer, unsigned long bufferS
 	int winSize/* =1024 */,
 	int hop /* = 256 */ )
 {
-	float* outbuffer = m_audioTimeScaling.WavReadBuffer( buffer, bufferSize, channels );
-	float* out = m_audioTimeScaling.TimeScaling( outbuffer, winSize, hop, scale );
+	float* outbuffer = m_audioTimeScalingS.WavReadBuffer( buffer, bufferSize, channels );
+	float* out = m_audioTimeScalingS.TimeScaling( outbuffer, winSize, hop, scale );
 	return out;
 }
 

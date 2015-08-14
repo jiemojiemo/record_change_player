@@ -11,8 +11,7 @@ private:
 	CProcesser& operator=( const CProcesser& cp ){}
 	CProcesser( const CProcesser& cp ){}
 
-	CPcm2Wav m_pcm2wav;		//pcm 转 wav处理
-	CAudioTimeScaling m_audioTimeScaling;	
+	CPcm2Wav m_pcm2wav;		//pcm 转 wav处理	
 	CAudioTimeSandPitchS	m_audioTimeScalingS;
 public:
 	CProcesser();

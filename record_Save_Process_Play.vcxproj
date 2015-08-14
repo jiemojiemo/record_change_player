@@ -96,8 +96,8 @@
     <ClInclude Include="func.h" />
     <ClInclude Include="pcm2wav.h" />
     <ClInclude Include="processer.h" />
+    <ClInclude Include="record.h" />
     <ClInclude Include="record16bits.h" />
-    <ClInclude Include="recorder.h" />
     <ClInclude Include="recordPlayer.h" />
     <ClInclude Include="record_Save_Process_PlayHeader.h" />
   </ItemGroup>

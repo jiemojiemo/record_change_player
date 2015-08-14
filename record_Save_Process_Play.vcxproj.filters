@@ -53,9 +53,6 @@
     <ClInclude Include="recordPlayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="recorder.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="func.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -78,6 +75,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CAudioTimeSandPitchS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="record.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

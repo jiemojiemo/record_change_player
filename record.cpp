@@ -1,119 +1,185 @@
-#include "recorder.h"
+#include "record.h"
+#include <stdio.h>
 #include <string>
 
+RecordeInfo CRecorder::m_Info;
 
-
-
-CRecoder::CRecoder( int seconds/*5*/ ):m_seconds(seconds)
+CRecorder::CRecorder()
 {
-	m_recordData.frameIndex = 0;
-	m_recordData.maxFrameIndex = seconds * SAMPLE_RATE;
-	m_recordData.totalBytes = m_recordData.maxFrameIndex*CHANNEL_COUNT * sizeof(SAMPLE);
-	m_recordData.recordedSamples = (SAMPLE*)malloc(m_recordData.totalBytes );
-	m_stream = NULL;
+	m_Data.frameIndex			= 0;
+	m_Data.maxFrameIndex		= 0;
+	m_Data.recordedSamples		= NULL;
+	m_Data.totalBytes			= 0;
+
+	m_Info.channels				= 0;
+	m_Info.sampleType			= 0;
+	m_Info.sampleRate			= 0;
+	m_Info.seconds				= 0;
+	m_Info.framesPerBuffer		= 0;
+
+	m_Stream					= NULL;
 }
 
-CRecoder::CRecoder( const RecordeInfo& info ):m_recordInfo(info)
+CRecorder::~CRecorder()
 {
-	m_stream = NULL;
-	m_recordData.frameIndex		= 0;
-	m_recordData.maxFrameIndex  = m_recordInfo.seconds * m_recordInfo.sampleRate;
-	m_recordData.totalBytes		= m_recordData.maxFrameIndex *
-								  m_recordInfo.channels * m_recordInfo.sampleBits;
-
-	switch( m_recordInfo.sampleBits )
+	if( m_Data.recordedSamples != NULL )
 	{
-	//case 32:
-	//	m_recordData.recordedSamples = (float*)malloc( m_recordData.totalBytes );
-	//	break;
-	//case 16:
-	//	m_recordData.recordedSamples = (short*)malloc( m_recordData.totalBytes );
-	//	break;
-	//case 8:
-	//	m_recordData.recordedSamples = (short*)malloc( m_recordData.totalBytes );
-	//	break;
-	//default:
-		m_recordData.recordedSamples = (float*)malloc( m_recordData.totalBytes );
+		free( m_Data.recordedSamples );
+		m_Data.recordedSamples = NULL;
+	}
+}
+
+CRecorder::CRecorder( const RecordeInfo& info )
+{
+	m_Stream					= NULL;
+	m_Data.recordedSamples		= NULL;
+	this->SetInfo( info );
+}
+
+/*******************************
+** FunctionName：GetSampleFormat
+** Comment:     根据bits获得format
+** return：     format
+** Creator：    HW
+** Date：		2015-8-14
+** Modifier：	
+** ModifyDate： 
+** Version：    1.0.0
+*******************************/
+PaSampleFormat CRecorder::GetSampleFormat()
+{
+	switch( m_Info.sampleType )
+	{
+	case SAMPLE_TYPE_FLOAT32:
+		return paFloat32;
+	case SAMPLE_TYPE_INT16:
+		return paInt16;
+	case SAMPLE_TYPE_INT8:
+		return paInt8;
+	case SAMPLE_TYPE_UINT8:
+		return paUInt8;
+	default:
+		return paFloat32;
+	}
+}
+
+//getter and setter
+void CRecorder::SetInfo( const RecordeInfo& info )
+{
+	m_Info = info;
+	m_Data.frameIndex			= 0;
+	m_Data.maxFrameIndex		= info.sampleRate * info.seconds;
+
+	if( m_Data.recordedSamples != NULL )
+	{
+		free( m_Data.recordedSamples );
+		m_Data.recordedSamples = NULL;
+	}
+
+	switch( m_Info.sampleType )
+	{
+	case SAMPLE_TYPE_FLOAT32:
+		m_Data.totalBytes	   = m_Data.maxFrameIndex * m_Info.channels * sizeof( float );
+		m_Data.recordedSamples = (float*)malloc( m_Data.totalBytes );
+		break;
+	case SAMPLE_TYPE_INT16:
+		m_Data.totalBytes	   = m_Data.maxFrameIndex * m_Info.channels * sizeof( short );
+		m_Data.recordedSamples = (short*)malloc( m_Data.totalBytes );
+		break;
+	case SAMPLE_TYPE_INT8:
+		m_Data.totalBytes	   = m_Data.maxFrameIndex * m_Info.channels * sizeof( char );
+		m_Data.recordedSamples = (char*)malloc( m_Data.totalBytes );
+		break;
+	case SAMPLE_TYPE_UINT8:
+		m_Data.totalBytes	   = m_Data.maxFrameIndex * m_Info.channels * sizeof( unsigned char );
+		m_Data.recordedSamples = (char*)malloc( m_Data.totalBytes );
+		break;
+	default:
+		m_Data.totalBytes	   = m_Data.maxFrameIndex * m_Info.channels * sizeof( float );
+		m_Data.recordedSamples = (float*)malloc( m_Data.totalBytes );
 		break;
 	}
 }
 
-//CRecoder::CRecoder( const RecordeInfo& info, FLOAT32 )
-//{
-//	_InitInfo( info );
-//	m_recordBits = FLOAT32_BITS;
-//	m_recordData.totalBytes *= sizeof( float );
-//	m_recordData.recordedSamples = (float*)malloc( m_recordData.totalBytes );
-//}
-//CRecoder::CRecoder( const RecordeInfo& info, INT16 )
-//{
-//	_InitInfo( info );
-//	m_recordBits = INT16_BITS;
-//	m_recordData.totalBytes *= sizeof( short );
-//	m_recordData.recordedSamples = (short*)malloc( m_recordData.totalBytes );
-//}
-//CRecoder::CRecoder( const RecordeInfo& info, INT8 )
-//{
-//	_InitInfo( info );
-//	m_recordBits = INT8_BITS;
-//	m_recordData.totalBytes *= sizeof( char );
-//	m_recordData.recordedSamples = (char*)malloc( m_recordData.totalBytes );
-//}
-//CRecoder::CRecoder( const RecordeInfo& info, UINT8 )
-//{
-//	_InitInfo( info );
-//	m_recordBits = UINT8_BITS;
-//	m_recordData.totalBytes *= sizeof( unsigned char );
-//	m_recordData.recordedSamples = (unsigned char*)malloc( m_recordData.totalBytes );
-//}
-
-
-CRecoder::~CRecoder()
+RecordeInfo CRecorder::GetInfo()const
 {
-	if( m_recordData.recordedSamples )
-	{
-		free( m_recordData.recordedSamples );
-		m_recordData.recordedSamples = NULL;
-	}
+	return m_Info;
 }
 
-void CRecoder::_InitInfo( const RecordeInfo& info )
-{
-	m_recordData.frameIndex = 0;
-	m_recordData.maxFrameIndex = info.seconds * info.sampleRate;
-	m_recordData.totalBytes = m_recordData.maxFrameIndex * info.channels;//* sizeof(bits)
-	m_stream = NULL;
-}
 
-int CRecoder::_StartRecode()
+/*******************************
+** FunctionName：StartRecord
+** Comment:     根据参数，进行录音
+** return：     错误标志位，0表示正确
+** Creator：    HW
+** Date：		2015-8-14
+** Modifier：	
+** ModifyDate： 
+** Version：    1.0.0
+*******************************/
+int CRecorder::StartRecord()
 {
+	PaStreamParameters		inputParameters;
 	PaError					err = paNoError;
 
-	//重置音频帧下标
-	m_recordData.frameIndex = 0;
+	printf( "Record Init\n" );fflush(stdout);
+	
+	//PortAudio Init
+	err = Pa_Initialize();					//设备初始化
+	if( err != paNoError ) return err;
 
-	err = Pa_StartStream( m_stream );
+	//设置输入设备参数
+	inputParameters.device = Pa_GetDefaultInputDevice();	//获取默认的输入设备
+	if( inputParameters.device == paNoDevice )
+	{
+		fprintf( stderr, "Error:No default input device.\n" );
+		return -1;
+	}
+
+	inputParameters.channelCount = m_Info.channels;
+	inputParameters.sampleFormat = this->GetSampleFormat();
+	inputParameters.suggestedLatency =
+		Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
+	inputParameters.hostApiSpecificStreamInfo = NULL;
+
+
+	//打开音频流，进行准备录音
+	err = Pa_OpenStream( &m_Stream,
+		&inputParameters,
+		NULL,	//no output
+		m_Info.sampleRate,
+		m_Info.framesPerBuffer,
+		paClipOff,
+		recordCallback,
+		&m_Data
+		);
+
+	//开始录音
+	err = Pa_StartStream( m_Stream );
 	if( err != paNoError )
 		return err;
 	printf("\n=== Now recording!! Please speak into the microphone. ===\n"); fflush(stdout);
 
-	while( ( err = Pa_IsStreamActive( m_stream ) ) == 1 )
+	//是否还在录音
+	while( ( err = Pa_IsStreamActive( m_Stream ) ) == 1 )
 	{
 		Pa_Sleep(1000);
-		printf("index = %d\n", m_recordData.frameIndex ); fflush(stdout);
+		printf("index = %d\n", m_Data.frameIndex ); fflush(stdout);
 	}
 	if( err < 0 )	return err;
 
-	err = Pa_StopStream( m_stream );
+	//结束录音
+	err = Pa_StopStream( m_Stream );
 	if( err < 0 )	return err;
 
 	//* Measure maximum peak amplitude. */
 	double max = 0;
 	double average = 0.0;
 	double val;
-	for( int i=0; i<m_recordData.maxFrameIndex * CHANNEL_COUNT; i++ )
+	float* data = (float*)m_Data.recordedSamples;
+	for( int i=0; i<m_Data.maxFrameIndex * m_Info.channels; i++ )
 	{
-		val = m_recordData.recordedSamples[i];
+		val = data[i];
 		if( val < 0 ) val = -val; /* ABS */
 		if( val > max )
 		{
@@ -122,235 +188,154 @@ int CRecoder::_StartRecode()
 		average += val;
 	}
 
-	average = average / (double)m_recordData.maxFrameIndex * CHANNEL_COUNT;
+	average = average / (double)m_Data.maxFrameIndex * m_Info.channels;
 
-	printf("sample max amplitude = "PRINTF_S_FORMAT"\n", max );
+	printf("sample max amplitude = %lf\n", max );
 	printf("sample average = %lf\n", average );
 
+	//关闭录音设备
+	Pa_Terminate();
+
 	return 0;
 }
 
-//void CRecoder::PrintMaxAndAver( unsigned int bits )
-//{
-//	MT_FLOAT32	m32;
-//	MT_INT16	m16;
-//	MT_INT8		m8;
-//	MT_UINT8	mu8;
-//	if( bits == FLOAT32_BITS )
-//		_PrintMaxAndAver(m32);
-//	else if( bits == INT16_BITS )
-//		_PrintMaxAndAver(m16);
-//	else if( bits == INT8_BITS )
-//		_PrintMaxAndAver(m8);
-//	else if( bits == UINT8_BITS )
-//		_PrintMaxAndAver( mu8 );
-//}
-//
-//void CRecoder::_PrintMaxAndAver( MT_FLOAT32 )
-//{
-//	//* Measure maximum peak amplitude. */
-//	float max = 0;
-//	double average = 0.0;
-//	unsigned int channels = m_recordData.totalBytes / m_recordData.maxFrameIndex / sizeof(float);
-//	double val;
-//	for( int i=0; i<m_recordData.maxFrameIndex * CHANNEL_COUNT; i++ )
-//	{
-//		val = (float*)m_recordData.recordedSamples[i];
-//		if( val < 0 ) val = -val; /* ABS */
-//		if( val > max )
-//		{
-//			max = val;
-//		}
-//		average += val;
-//	}
-//
-//	average = average / (double)m_recordData.maxFrameIndex * channels;
-//
-//	printf("sample max amplitude = %f\n", max );
-//	printf("sample average = %lf\n", average );
-//}
-//void CRecoder::_PrintMaxAndAver( MT_INT16 )
-//{
-//	//* Measure maximum peak amplitude. */
-//	int max = 0;
-//	double average = 0;
-//	unsigned int channels = m_recordData.totalBytes / m_recordData.maxFrameIndex / sizeof(short);
-//	double val;
-//	for( int i=0; i<m_recordData.maxFrameIndex * CHANNEL_COUNT; i++ )
-//	{
-//		val = (short*)m_recordData.recordedSamples[i];
-//		if( val < 0 ) val = -val; /* ABS */
-//		if( val > max )
-//		{
-//			max = val;
-//		}
-//		average += val;
-//	}
-//
-//	average = average / (double)m_recordData.maxFrameIndex * channels;
-//
-//	printf("sample max amplitude = %d\n", max );
-//	printf("sample average = %lf\n", average );
-//}
-//void CRecoder::_PrintMaxAndAver( MT_INT8 )
-//{
-//	//* Measure maximum peak amplitude. */
-//	char max = 0;
-//	double average = 0;
-//	unsigned int channels = m_recordData.totalBytes / m_recordData.maxFrameIndex / sizeof(char);
-//	double val;
-//	for( int i=0; i<m_recordData.maxFrameIndex * CHANNEL_COUNT; i++ )
-//	{
-//		val = (char*)m_recordData.recordedSamples[i];
-//		if( val < 0 ) val = -val; /* ABS */
-//		if( val > max )
-//		{
-//			max = val;
-//		}
-//		average += val;
-//	}
-//
-//	average = average / (double)m_recordData.maxFrameIndex * channels;
-//
-//	printf("sample max amplitude = %d\n", max );
-//	printf("sample average = %lf\n", average );
-//}
-//void CRecoder::_PrintMaxAndAver( MT_UINT8 )
-//{
-//	//* Measure maximum peak amplitude. */
-//	unsigned char max = 0;
-//	double average = 0;
-//	unsigned int channels = m_recordData.totalBytes / m_recordData.maxFrameIndex / sizeof(unsigned char);
-//	double val;
-//	for( int i=0; i<m_recordData.maxFrameIndex * CHANNEL_COUNT; i++ )
-//	{
-//		val = (unsigned char*)m_recordData.recordedSamples[i];
-//		if( val < 0 ) val = -val; /* ABS */
-//		if( val > max )
-//		{
-//			max = val;
-//		}
-//		average += val;
-//	}
-//
-//	average = average / (double)m_recordData.maxFrameIndex * channels;
-//
-//	printf("sample max amplitude = %d\n", max );
-//	printf("sample average = %lf\n", average );
-//}
-
-int CRecoder::StartRecode()
+/*******************************
+** FunctionName：SavePcm2File
+** Comment:     将record中的数据保存到文件里
+**（参数）@Param inFile: 要保存的文件名
+** return：    
+** Creator：    HW
+** Date：		2015-8-14
+** Modifier：	
+** ModifyDate： 
+** Version：    1.0.0
+*******************************/
+void CRecorder::SavePcm2File( const char* inFile )
 {
-	return _StartRecode();
-}
-
-int CRecoder::StartRecode( const RecordeInfo& info )
-{
-	return _StartRecode();
-}
-
-int CRecoder::CloseRocode()
-{
-	PaError		err = paNoError;
-	err = Pa_CloseStream( m_stream );
-	if( err != paNoError )
-		return err;
-	return 0;
-}
-int CRecoder::Init()
-{
-	
-	PaStreamParameters		inputParameters;
-	PaError					err = paNoError;
-
-	printf( "Record Init\n" );fflush(stdout);
-
-	err = Pa_Initialize();					//设备初始化
-	if( err != paNoError ) return err;
-
-	inputParameters.device = Pa_GetDefaultInputDevice();	//获取默认的输入设备
-	if( inputParameters.device == paNoDevice )
+	FILE* file = fopen( inFile, "wb" );
+	if( file == NULL )
 	{
-		fprintf( stderr, "Error:No default input device.\n" );
-		return -1;
+		fprintf( stderr, "Error: Cannot open the file.\n" );
+		return;
+	}
+	if( m_Data.recordedSamples != NULL )
+	{
+		printf( "%d bytes save in %s.\n", m_Data.totalBytes, inFile );
+		fwrite( m_Data.recordedSamples, 1, m_Data.totalBytes, file );
+	}
+	else
+	{
+		fprintf( stderr, "Error:no data can be saved.\n" );
 	}
 
-	inputParameters.channelCount = CHANNEL_COUNT;
-	inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-	inputParameters.suggestedLatency =
-		Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
-	inputParameters.hostApiSpecificStreamInfo = NULL;
-
-	//打开音频流，进行准备
-	err = Pa_OpenStream( &m_stream,
-					&inputParameters,
-					NULL,
-					SAMPLE_RATE,
-					FRAME_PER_BUFFER,
-					paClipOff,
-					recordCallback,
-					&m_recordData
-		);
-
-	return 0;
+	fclose( file );
 }
-int CRecoder::recordCallback(const void *inputBuffer,
+
+/*******************************
+**（函数名）recordCallback
+**（参数）@Param inputBuffer: 输入流
+**（参数）@Param outputBuffer：输出流
+**（参数）@Param framesPerBuffer：缓冲区大小
+**（参数）@Param timeInfo： 
+**（参数）@Param statusFlags：
+**（参数）@Param userData： 自定义数据
+**（功能用途）：录音的回调函数
+**（返回值）return：
+** (作者)Creator：HW
+** (日期)Date：2015-08-14
+**（修改人）Modifier：
+**（修改日期）ModifyDate：
+**（版本）Version：
+*******************************/
+int CRecorder::recordCallback(const void *inputBuffer, 
 	void *outputBuffer, unsigned long framesPerBuffer, 
 	const PaStreamCallbackTimeInfo* timeInfo,
-	PaStreamCallbackFlags statusFlags, 
-	void *userData)
+	PaStreamCallbackFlags statusFlags, void *userData)
 {
-	paTestData *data = (paTestData*)userData;
-	const SAMPLE *rptr = (const SAMPLE*)inputBuffer;
-	SAMPLE *wptr = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT];
-
-
-
+	RecordData* data = (RecordData*)userData;
+	
 	(void) outputBuffer; /* Prevent unused variable warnings. */
 	(void) timeInfo;
 	(void) statusFlags;
 	(void) userData;
-	if( framesLeft < framesPerBuffer )
+
+	if( m_Info.sampleType == SAMPLE_TYPE_FLOAT32 )
+	{
+		float* buffer = (float*)data->recordedSamples;
+		float* wptr = &buffer[ data->frameIndex * m_Info.channels ];
+		return _DoRecord( data, wptr,inputBuffer, 0.0f );
+	}
+
+	else if( m_Info.sampleType == SAMPLE_TYPE_INT16 )
+	{
+		short* buffer = (short*)data->recordedSamples;
+		short* wptr = &buffer[ data->frameIndex * m_Info.channels ];
+		return _DoRecord( data, wptr,inputBuffer, 0.0f );
+	}
+
+	else if( m_Info.sampleType == SAMPLE_TYPE_INT8 )
+	{
+		char* buffer = (char*)data->recordedSamples;
+		char* wptr = &buffer[ data->frameIndex * m_Info.channels ];
+		return _DoRecord( data, wptr,inputBuffer, 0.0f );
+	}
+
+	else if( m_Info.sampleType == SAMPLE_TYPE_UINT8 )
+	{
+		unsigned char* buffer = (unsigned char*)data->recordedSamples;
+		unsigned char* wptr = &buffer[ data->frameIndex * m_Info.channels ];
+		return _DoRecord( data, wptr,inputBuffer, 128 );
+	}
+
+	return 1;
+}
+
+/*******************************
+**（函数名）_DoRecord
+**（参数）@Param data: 自定义数据
+**（参数）@Param wptr：录音保存的buffer的指针
+**（参数）@Param rptr：音频输入的指针
+**（参数）@Param silence： 静音的值
+**（功能用途）：录音的回调函数
+**（返回值）return：
+** (作者)Creator：HW
+** (日期)Date：2015-08-14
+**（修改人）Modifier：
+**（修改日期）ModifyDate：
+**（版本）Version：
+*******************************/
+template <typename T>
+int CRecorder::_DoRecord( RecordData* data, T wptr,const void* inputBuffer, double silence )
+{
+	long framesToCalc;
+	long i;
+	int finished;
+	unsigned long framesLeft = data->maxFrameIndex - data->frameIndex;
+
+	const float* rptr = (const float*)inputBuffer;
+	if( framesLeft < m_Info.framesPerBuffer )
 	{
 		framesToCalc = framesLeft;
 		finished = paComplete;
 	}
 	else
 	{
-		framesToCalc = framesPerBuffer;
+		framesToCalc = m_Info.framesPerBuffer;
 		finished = paContinue;
 	}
 
 	if( inputBuffer == NULL )
 	{
-		for( i=0; i<framesToCalc; i++ )
-		{
-			*wptr++ = SAMPLE_SILENCE; /* left */
-			if( CHANNEL_COUNT == 2 )
-				*wptr++ = SAMPLE_SILENCE;  /* right */
-
-		}
+		for( i=0; i<framesToCalc * m_Info.channels; i++ )
+			*wptr++ = silence;
 	}
 	else
 	{
-		for( i=0; i<framesToCalc; i++ )
+		for( i=0; i<framesToCalc * m_Info.channels; i++ )
 		{
 			*wptr++ = *rptr++;  /* left */
-			if( CHANNEL_COUNT == 2 ) 
-				*wptr++ = *rptr++;  /* right */
 		}
 	}
 	data->frameIndex += framesToCalc;
 	return finished;
-}
-
-
-static int recordCallback32Bits(
-	const void *inputBuffer, void *outputBuffer,
-	unsigned long framesPerBuffer,
-	const PaStreamCallbackTimeInfo* timeInfo,
-	PaStreamCallbackFlags statusFlags,
-	void *userData)
-{
-
 }

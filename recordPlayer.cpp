@@ -20,15 +20,15 @@ CRecordPlayer::CRecordPlayer( unsigned long byteSize,const SAMPLE* data )
 	memcpy( m_data.recordedSamples, data, byteSize );
 }
 
-CRecordPlayer::CRecordPlayer( const CRecoder& recorder )
+CRecordPlayer::CRecordPlayer( const CRecorder& recorder )
 {
-	m_data.maxFrameIndex = recorder.m_recordData.maxFrameIndex;
-	m_data.totalBytes = recorder.m_recordData.totalBytes;
+	m_data.maxFrameIndex = recorder.m_Data.maxFrameIndex;
+	m_data.totalBytes = recorder.m_Data.totalBytes;
 	m_data.frameIndex = 0;
 	m_data.recordedSamples = (SAMPLE *)malloc( m_data.totalBytes );
 
 	assert( m_data.recordedSamples != NULL );
-	memcpy( m_data.recordedSamples, recorder.m_recordData.recordedSamples,
+	memcpy( m_data.recordedSamples, recorder.m_Data.recordedSamples,
 		m_data.totalBytes);
 }
 CRecordPlayer::CRecordPlayer( const char* url )

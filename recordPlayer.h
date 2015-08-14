@@ -1,13 +1,13 @@
 #ifndef RECORDPLAYER_H
 #define RECORDPLAYER_H
 #include "record_Save_Process_PlayHeader.h"
-#include "recorder.h"
 #include "portaudio.h"
+#include "record.h"
 /**
 * @brief : ≤•∑≈“Ù∆µ∫Õœ‘ æ“Ù∆µ≤®
 */
 class CRecordPlayer{
-	friend class CRecoder;
+	friend class CRecorder;
 private:
 	CRecordPlayer( const CRecordPlayer& p ){}
 	CRecordPlayer& operator=( const CRecordPlayer& p ){}
@@ -25,7 +25,7 @@ private:
 	PaStream* m_stream;
 public:
 	CRecordPlayer( unsigned long byteSize, const SAMPLE* data );
-	CRecordPlayer( const CRecoder& recorder );
+	CRecordPlayer( const CRecorder& recorder );
 	CRecordPlayer( const char* url );
 	~CRecordPlayer();
 
