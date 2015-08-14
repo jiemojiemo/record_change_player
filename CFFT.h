@@ -1,3 +1,6 @@
+#ifndef CFFT_H
+#define CFFT_H
+
 #include "math.h"
 
 #define PI 3.1415926535897932384626433832795028841971
@@ -28,3 +31,6 @@ public:
 	void ifft(int N,complex f[]); // ¸µÀïÒ¶Äæ±ä»»	
 
 };
+
+#endif
+

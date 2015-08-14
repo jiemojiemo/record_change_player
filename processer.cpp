@@ -24,3 +24,11 @@ float* CProcesser::TimeScaling( float scale,float* buffer, unsigned long bufferS
 	float* out = m_audioTimeScaling.TimeScaling( outbuffer, winSize, hop, scale );
 	return out;
 }
+
+float* CProcesser::PitchShifting( int shift, float* buffer, unsigned long bufferSize, int channels /* = 1 */,
+	int winSize/* =1024 */, int hop /* = 256 */ )
+{
+	float* outbuffer = m_audioTimeScalingS.WavReadBuffer( buffer, bufferSize, channels );
+	float* out = m_audioTimeScalingS.PitchShifting( outbuffer, winSize, hop, shift );
+	return out;
+}

@@ -3,6 +3,7 @@
 
 #include "pcm2wav.h"
 #include "CAudioTimeScaling.h"
+#include "CAudioTimeSandPitchS.h"
 
 class CProcesser
 {
@@ -11,7 +12,8 @@ private:
 	CProcesser( const CProcesser& cp ){}
 
 	CPcm2Wav m_pcm2wav;		//pcm ×ª wav´¦Àí
-	CAudioTimeScaling m_audioTimeScaling;						//
+	CAudioTimeScaling m_audioTimeScaling;	
+	CAudioTimeSandPitchS	m_audioTimeScalingS;
 public:
 	CProcesser();
 
@@ -20,8 +22,10 @@ public:
 	float* TimeScaling( float scale,float* buffer, unsigned long bufferSize, int channels = 1, int winSize=1024,
 		int hop = 256
 		);
-
-	unsigned long GetAfterScaleSize(){ return m_audioTimeScaling.GetSize(); }
+	float* PitchShifting( int shift, float* buffer, unsigned long bufferSize, int channels = 1, int winSize=1024,
+		int hop = 256  );
+	unsigned long GetAfterScaleSize(){ return m_audioTimeScalingS.GetSize(); }
+	float GetAfterPitchShitingSampleRate(){ return m_audioTimeScalingS.GetSampleRateScale(); }
 }; 
 
 #endif

@@ -42,6 +42,9 @@
     <ClCompile Include="CWavread.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CAudioTimeSandPitchS.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="record_Save_Process_PlayHeader.h">
@@ -72,6 +75,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CWavread.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CAudioTimeSandPitchS.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,21 +16,24 @@ int main()
 
 	unsigned int bufferSize;
 	CProcesser pro;
-	Pcm2WavInfo info;
-	info.channels	= 1;
-	info.formatTag	= 3;
-	info.sampleRate = 44100;
-	info.sampleBits = 32;
-	info.inFileName = "";
-	info.outFileName= "out_1_16int_44100.wav";
+
 	//pro.Pcm2Wav( (float*)recoder.GetRecordData(), bufferSize, info );
 	
 
 	//Processer
 	//......
 
-	float* out = pro.TimeScaling( 0.3, (float*)recoder.GetRecordData(), recoder.GetRecordDataSize() );
+	//float* out = pro.TimeScaling( 0.3, (float*)recoder.GetRecordData(), recoder.GetRecordDataSize() );
+	float* out = pro.PitchShifting( 8, (float*)recoder.GetRecordData(), recoder.GetRecordDataSize() );
 	bufferSize = pro.GetAfterScaleSize();
+
+	Pcm2WavInfo info;
+	info.channels	= 1;
+	info.formatTag	= 3;
+	info.inFileName = "";
+	info.outFileName= "out_1_16int_44100.wav";
+	info.sampleBits = 32;
+	info.sampleRate = 44100*pro.GetAfterPitchShitingSampleRate();
 	pro.Pcm2Wav( out, bufferSize, info );
 
 	CRecordPlayer player( bufferSize, out );
