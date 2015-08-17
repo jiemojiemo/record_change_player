@@ -19,8 +19,13 @@ SAMPLE* g_audioBuffer = NULL;	//存放音频数据的buffer
 SAMPLE* g_copyaudioBuffer = NULL;	//音频数据的副本
 int g_bytes = FRAME_PER_BUFFER * CHANNEL_COUNT * sizeof(SAMPLE);	//要申请空间的大小
 unsigned int g_depth = 32;		//一共有多少音波
-GLfloat g_space = .10f;			//音波之间的间隔
-GLfloat g_mul	= 3.0f;			//为了凸显音波，一个乘系数
+GLfloat g_space = .4f;			//音波之间的间隔
+GLfloat g_mul	= 10.0f;			//为了凸显音波，一个乘系数
+
+// light 1 parameters
+GLfloat g_light1_ambient[] = { .2f, .2f, .2f, 1.0f };
+GLfloat g_light1_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat g_light1_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 
 list<SWaves> g_waveList;			//存放一堆音波数据
@@ -146,7 +151,7 @@ void DisplayFunction()
 	//进行绘制
 	DrawWaves();
 	//将音频数据存放在list中，方便绘制
-	if( count % 10 == 9 )
+	if( count % 12 == 11 )
 	{
 		if( g_waveList.size() <= g_depth )
 		{
@@ -203,7 +208,7 @@ void DrawWaves()
 *******************************/
 void DrawWaveOnTop()
 {
-	GLfloat x = -3.0f, inc = 6.0f / FRAME_PER_BUFFER, y = 0.70f;
+	GLfloat x = -3.0f, inc = 6.0f / FRAME_PER_BUFFER, y = 0.80f;
 	GLint ii = FRAME_PER_BUFFER / 2;
 	glColor3f( 0.0f, 0.8f, 0.0f );
 	glBegin( GL_LINE_STRIP );
@@ -314,12 +319,40 @@ void ReshapeFunction( int w, int h )
 *******************************/
 void InitializeGraphics()
 {
-	//设置背景颜色
-	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	//开启深度检测
-	glEnable( GL_DEPTH_TEST );
+	////设置背景颜色
+	//glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	////开启深度检测
+	//glEnable( GL_DEPTH_TEST );
 
-	glutPostRedisplay();
+	//glutPostRedisplay();
+
+	// set the GL clear color - use when the color buffer is cleared
+	glClearColor( 0.0f, 0.0f,0.0f, 1.0f );
+	// set the shading model to 'smooth'
+	glShadeModel( GL_SMOOTH );
+	// enable depth
+	glEnable( GL_DEPTH_TEST );
+	// set the front faces of polygons
+	glFrontFace( GL_CCW );
+	// set fill mode
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	// enable lighting
+	glEnable( GL_LIGHTING );
+	// enable lighting for front
+	glLightModeli( GL_FRONT, GL_TRUE );
+	// material have diffuse and ambient lighting 
+	glColorMaterial( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
+	// enable color
+	glEnable( GL_COLOR_MATERIAL );
+
+	// enable light 0
+	glEnable( GL_LIGHT0 );
+
+	// setup and enable light 1
+	glLightfv( GL_LIGHT1, GL_AMBIENT, g_light1_ambient );
+	glLightfv( GL_LIGHT1, GL_DIFFUSE, g_light1_diffuse );
+	glLightfv( GL_LIGHT1, GL_SPECULAR, g_light1_specular );
+	glEnable( GL_LIGHT1 );
 }
 
 /*******************************

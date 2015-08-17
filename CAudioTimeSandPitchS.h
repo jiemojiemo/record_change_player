@@ -45,4 +45,5 @@ public:
 	float  GetSampleRateScale(){return m_sampleRateScale;}
 	float* PitchShifting(float* dataIn,int winSize,int hop,int shift);
 	float* resample(float* dataIn,int scale);
+	float* TimeScalingAndPitchShifting(int shift, float scale,float* dataIn,int winSize,int hop);
 };

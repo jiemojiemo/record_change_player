@@ -18,6 +18,7 @@ public:
 
 	int Pcm2Wav( const Pcm2WavInfo& info );
 	int Pcm2Wav( const float* buffer, unsigned long bufferSize,const Pcm2WavInfo& info );
+	float* TimeScalingAndPitchShifting(int shift, float scale,float* dataIn,unsigned int bufferSize,int channels = 1,int winSize=1024,int hop=256);
 	float* TimeScaling( float scale,float* buffer, unsigned long bufferSize, int channels = 1, int winSize=1024,
 		int hop = 256
 		);

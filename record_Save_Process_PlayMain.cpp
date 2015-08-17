@@ -26,54 +26,20 @@ int main()
 #endif
 	unsigned int bufferSize = recorder.GetDataSize();
 	CProcesser pro;
-	int c;
-	cout << "1) 变速" << endl;
-	cout << "2) 变调" << endl;
-	cout << "3) 变速加变调" << endl;
-	cin >>c;
-	if( 1 == c )
-	{
-		double scale = 0.0;
-		cout << "变速速率( 0.1 -- 5.0 )：";
-		cin >> scale;
-		//变速处理
-		float* out = pro.TimeScaling( scale, (float*)recorder.GetData(), recorder.GetDataSize() );
-		bufferSize = pro.GetAfterScaleSize();
-		CRecordPlayer player( bufferSize, out );
-		player.Init();
-		player.StartPlay();
-	}
-	else if( 2 == c )
-	{
-		int pitch = 0;
-		cout << "音高变化( -10 -- 10 ):";
-		cin >> pitch;
-		//变调处理
-		float* out = pro.PitchShifting( pitch, (float*)recorder.GetData(), recorder.GetDataSize() );
-		bufferSize = pro.GetAfterPitchSize();
-		CRecordPlayer player( bufferSize, out );
-		player.Init();
-		player.StartPlay();
-	}
-	else if( 3 == c )
-	{
-		double scale = 0.0;
-		cout << "变速速率( 0.1 -- 5.0 )：";
-		cin >> scale;
-		int pitch = 0;
-		cout << "音高变化( -10 -- 10 ):";
-		cin >> pitch;
-		//变速处理
-		float* scaleOut = pro.TimeScaling( scale, (float*)recorder.GetData(), recorder.GetDataSize() );
-		bufferSize = pro.GetAfterScaleSize();
-		//变调处理
-		float* out = pro.PitchShifting( pitch, scaleOut, bufferSize );
-		bufferSize = pro.GetAfterPitchSize();
-		CRecordPlayer player( bufferSize, out );
-		player.Init();
-		player.StartPlay();
 
-	}
+	double scale = 0.0;
+	cout << "变速速率( 0.1 -- 5.0 )：";
+	cin >> scale;
+	int pitch = 0;
+	cout << "音高变化( -10 -- 10 ):";
+	cin >> pitch;
+	float *out = pro.TimeScalingAndPitchShifting( pitch, scale,(float*)recorder.GetData(), recorder.GetDataSize() );
+	bufferSize = pro.GetAfterPitchSize();
+	CRecordPlayer player( bufferSize, out );
+	player.Init();
+	player.StartPlay();
+
+	
 //	//unsigned int bufferSize = recorder.GetDataSize();
 //	//CProcesser pro;
 //	//变速处理

@@ -31,7 +31,7 @@ float* CAudioTimeSandPitchS::WavReadBuffer(float* buffer,unsigned long bufferSiz
 	m_PCMSize = bufferSize/channel/32*8;
 	if(channel==1)
 		return buffer;
-	float* Out=new float[bufferSize/channel];
+	//float* Out=new float[bufferSize/channel];
 	if(channel==2)
 	{
 		
@@ -47,7 +47,11 @@ float* CAudioTimeSandPitchS::TimeScaling(float* DataIn,int winSize,int hop,float
 	m_STFTOutCol=(winSize/2)+1;
 	m_scale=scale;
 	m_sampleRateScale=1;
-
+	if( fabs(m_scale - 1.0) < 0.00001f )
+	{
+		m_timeScaleSize = m_PCMSize;
+		return DataIn;
+	}
 	complex**	dataout1=STFT(DataIn);
 	complex**	dataout2=PVsample(dataout1);
 	float*		dataout3=ISTFT(dataout2);			
@@ -293,6 +297,7 @@ float* CAudioTimeSandPitchS::PitchShifting(float* dataIn,int winSize,int hop,int
 
 float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 {
+	
 
 	if (scale>10)
 	{
@@ -301,10 +306,9 @@ float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 	}
 
 	int scale_s=scale > 0 ? scale : (0-scale);
-
-
-
 	m_resampleSize=m_timeScaleSize*(20.0-scale)/20.0;
+	if( scale == 0 )
+		return dataIn;
 
 	float* dataOut=new float[m_resampleSize];
 	memset( dataOut, 0, m_resampleSize*sizeof(float) );
@@ -344,7 +348,7 @@ float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 		}
 	}
 
-	else
+	else if( scale < 0 )
 	{
 		for (int i=0;i<m_timeScaleSize;i++)
 		{
@@ -362,13 +366,14 @@ float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 		}
 
 	}
+	else 
+		return dataIn;
 	fstream f;
 	f.open("D:/1.txt",ios::app);
 	for (int i=0;i<m_resampleSize;i++)
 	{
 		f<<dataOut[i]<<std::endl;
 	}
-
 	return dataOut;
 
 }
@@ -382,4 +387,13 @@ bool CAudioTimeSandPitchS::Ismiss( int scale )
 	if( double(num)/100.0 < rate )
 		return true;
 	return false;
+}
+
+float* CAudioTimeSandPitchS::TimeScalingAndPitchShifting(int shift, float scale,float* dataIn,int winSize,int hop)
+{
+	float scaleTime=scale*(float)(20-shift)/20.0;
+	float* out=TimeScaling(dataIn,winSize,hop,scaleTime);
+	out=resample(out,shift);
+	return out;
+
 }

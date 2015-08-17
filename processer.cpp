@@ -47,3 +47,10 @@ float* CProcesser::PitchShifting( int shift, float* buffer,
 	return out;
 
 }
+
+float* CProcesser::TimeScalingAndPitchShifting(int shift, float scale,
+	float* dataIn,unsigned int bufferSize,int channels, int winSize,int hop)
+{
+	float* outbuffer = m_audioTimeScalingS.WavReadBuffer( dataIn, bufferSize, channels );
+	return m_audioTimeScalingS.TimeScalingAndPitchShifting( shift,scale,outbuffer,winSize,hop );
+}
