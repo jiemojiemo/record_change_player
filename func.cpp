@@ -19,7 +19,8 @@ SAMPLE* g_audioBuffer = NULL;	//存放音频数据的buffer
 SAMPLE* g_copyaudioBuffer = NULL;	//音频数据的副本
 int g_bytes = FRAME_PER_BUFFER * CHANNEL_COUNT * sizeof(SAMPLE);	//要申请空间的大小
 unsigned int g_depth = 32;		//一共有多少音波
-GLfloat g_space = .1f;			//音波之间的间隔
+GLfloat g_space = .12f;			//音波之间的间隔
+GLfloat g_mul	= 3.0f;			//为了凸显音波，一个乘系数
 
 
 list<SWaves> g_waveList;			//存放一堆音波数据
@@ -92,7 +93,7 @@ int Display( void* data )
 	//设置窗口大小
 	glutInitWindowSize( g_width, g_height );
 	//窗口起始位置
-	glutInitWindowPosition( 100, 100 );
+	glutInitWindowPosition(200, 200 );
 	//创建窗口
 	glutCreateWindow( "Display" );
 	//设置全局的回调函数（每时每刻都在回调）
@@ -131,20 +132,22 @@ void IdelFunction()
 **（返回值）return： 
 ** (作者)Creator：
 ** (日期)Date：
-**（修改人）Modifier：
-**（修改日期）ModifyDate：
-**（版本）Version：
+**（修改人）Modifier：HW
+**（修改日期）ModifyDate：2015-08-17
+**（版本）Version：1.1
 *******************************/
 void DisplayFunction()
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	if( g_dataReady )
+	while( !g_dataReady )
+		;
+	static int count = 0;
+	printf( "%d\n",count++ ); 
+	//进行绘制
+	DrawWaves();
+	//将音频数据存放在list中，方便绘制
+	if( count % 10 == 9 )
 	{
-		static int count = 0;
-		printf( "%d\n",count++ ); 
-		//进行绘制
-		DrawWaves();
-		//将音频数据存放在list中，方便绘制
 		if( g_waveList.size() <= g_depth )
 		{
 			if( g_waveList.size() == g_depth )
@@ -152,6 +155,22 @@ void DisplayFunction()
 			g_waveList.push_front( g_audioBuffer );
 		}
 	}
+
+	
+	//if( g_dataReady )
+	//{
+	//	static int count = 0;
+	//	printf( "%d\n",count++ ); 
+	//	//进行绘制
+	//	DrawWaves();
+	//	//将音频数据存放在list中，方便绘制
+	//	if( g_waveList.size() <= g_depth )
+	//	{
+	//		if( g_waveList.size() == g_depth )
+	//			g_waveList.pop_back();
+	//		g_waveList.push_front( g_audioBuffer );
+	//	}
+	//}
 	glutSwapBuffers();
 }
 /*******************************
@@ -184,13 +203,13 @@ void DrawWaves()
 *******************************/
 void DrawWaveOnTop()
 {
-	GLfloat x = -3.0f, inc = 6.0f / FRAME_PER_BUFFER, y = 0.50f;
+	GLfloat x = -3.0f, inc = 6.0f / FRAME_PER_BUFFER, y = 0.70f;
 	GLint ii = FRAME_PER_BUFFER / 2;
 	glColor3f( 0.0f, 0.8f, 0.0f );
 	glBegin( GL_LINE_STRIP );
 		for( int i =0; i < FRAME_PER_BUFFER; ++i )
 		{
-			glVertex3f( x, 3.0*g_audioBuffer[i] + y, 0.0f );
+			glVertex3f( x, g_mul*g_audioBuffer[i] + y, 0.0f );
 			x += inc;
 		}
 	glEnd();
@@ -214,22 +233,23 @@ void DrawWaveOnTop()
 *******************************/
 void DrawWavesOnButton()
 {
-	GLfloat x = -2.0f, inc = 3.6f / FRAME_PER_BUFFER;
-	GLfloat y = -1.0f;
+	GLfloat x = -2.50f, inc = 5.f / FRAME_PER_BUFFER;
+	GLfloat z = 0.0f;
+	GLfloat y = -1.00f;
 	GLint ii = FRAME_PER_BUFFER / 2;
 	int count = 0;
-	glColor3f( 0.0f, 0.0f, 0.80f );
+	glColor3f( 0.60f, 0.6f, 0.00f );
 	for( auto it = g_waveList.begin(); it != g_waveList.end(); ++it )
 	{
-		x = -1.80f;
+		x = -2.20f;
 		glBegin( GL_LINE_STRIP );
 
 			for( int i = 0; i < FRAME_PER_BUFFER; ++i )
 			{
-				glVertex3f( x, (*it)[i]+y, count * g_space );
+				glVertex3f( x, g_mul*(*it)[i] + y, count * g_space + z );
 				x += inc;
 			}
-		count++;
+		count--;
 		glEnd();
 	}
 }
@@ -270,7 +290,7 @@ void ReshapeFunction( int w, int h )
 	gluPerspective( 45.0, (GLfloat) w / (GLfloat) h, 1.0, 100.0 );
 	//glOrtho( -1.0, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f );
 
-	gluLookAt( 0.0f, 3.0f, 2.5f , 
+	gluLookAt( 0.0f, .80f, 2.5f , 
 		0.0f, 0.0f, 0.0f, 
 		0.0f, 1.0f, 0.0f );
 

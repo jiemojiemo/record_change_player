@@ -4,6 +4,7 @@
 #include "recordPlayer.h"
 
 #define SAVE_RECORD 0
+#define SAVE_PROCESS_RECORD_TO_WAV 0
 
 int main()
 {
@@ -30,14 +31,17 @@ int main()
 	//float* out = pro.PitchShifting( 8, (float*)recorder.GetData(), recorder.GetDataSize() );
 	bufferSize = pro.GetAfterScaleSize();
 
+#if SAVE_PROCESS_RECORD_TO_WAV
 	Pcm2WavInfo info;
 	info.channels	= 1;
-	info.formatTag	= 3;
+	info.formatTag	= 3;	//3∂‘”¶32bit float
 	info.inFileName = "";
-	info.outFileName= "out_1_16int_44100.wav";
+	info.outFileName= "out_1_32float_44100.wav";
 	info.sampleBits = 32;
 	info.sampleRate = 44100;
 	pro.Pcm2Wav( out, bufferSize, info );
+#endif
+
 
 
 
