@@ -1,5 +1,5 @@
 #include "CAudioTimeSandPitchS.h"
-#include <assert.h>
+//#include <assert.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -272,7 +272,7 @@ float* CAudioTimeSandPitchS::PitchShiftingFile(float* dataIn,int winSize,int hop
 	if(shift>19)
 	{
 		printf("音高调整尺度有误！\n");
-		assert(shift<20);
+		//assert(shift<20);
 	}
 	float scale=(float)(20-shift)/20;
 	float* Out=TimeScaling(dataIn,winSize,hop,scale);
@@ -286,7 +286,7 @@ float* CAudioTimeSandPitchS::PitchShifting(float* dataIn,int winSize,int hop,int
 	if(shift>20)
 	{
 		printf("音高调整尺度有误！\n");
-		assert(shift<20);
+		//assert(shift<20);
 	}
 	float scale=(float)(20-shift)/20;
 	float* Out=TimeScaling(dataIn,winSize,hop,scale);
@@ -322,10 +322,14 @@ float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 			{
 				for (int j=0;j<20-(10-scale)*2;j+=2)
 				{
+					if( a >= m_resampleSize )
+						break;
 					dataOut[a++]=dataIn[i+j];
 				}
 				for (int k=20-(10-scale)*2;k<20;k++)
 				{
+					if( a >= m_resampleSize )
+						break;
 					dataOut[a++]=dataIn[i+k];
 				}
 
@@ -341,6 +345,8 @@ float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 				{
 					i++;
 				}
+				if( a >= m_resampleSize )
+					break;
 				dataOut[a++]=dataIn[i];
 				//printf("%d,%d\n",a,i);
 
@@ -352,6 +358,8 @@ float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
 	{
 		for (int i=0;i<m_timeScaleSize;i++)
 		{
+			if( a >= m_resampleSize )
+				break;
 			dataOut[a]=dataIn[i];
 			//	printf("a:%d,i%d\n",a,i);
 			int test=(i+1)%(20/scale_s);

@@ -16,7 +16,7 @@ CRecordPlayer::CRecordPlayer( unsigned long byteSize,const SAMPLE* data )
 	m_data.totalBytes = byteSize;
 	m_data.recordedSamples = ( SAMPLE* )malloc( byteSize );
 
-	assert( m_data.recordedSamples != NULL );
+	//assert( m_data.recordedSamples != NULL );
 	memcpy( m_data.recordedSamples, data, byteSize );
 }
 
@@ -27,14 +27,14 @@ CRecordPlayer::CRecordPlayer( const CRecorder& recorder )
 	m_data.frameIndex = 0;
 	m_data.recordedSamples = (SAMPLE *)malloc( m_data.totalBytes );
 
-	assert( m_data.recordedSamples != NULL );
+	//assert( m_data.recordedSamples != NULL );
 	memcpy( m_data.recordedSamples, recorder.m_Data.recordedSamples,
 		m_data.totalBytes);
 }
 CRecordPlayer::CRecordPlayer( const char* url )
 {
 	FILE* file = fopen( url, "rb" );
-	assert( file );
+	//assert( file );
 	fseek( file, 0, SEEK_END );
 	int fileSize = ftell( file );
 	fseek( file, 0, SEEK_SET );
@@ -42,7 +42,7 @@ CRecordPlayer::CRecordPlayer( const char* url )
 	m_data.frameIndex = 0;
 	m_data.totalBytes = fileSize;
 	m_data.recordedSamples = (SAMPLE*)malloc( fileSize );
-	assert( m_data.recordedSamples != NULL );
+//	assert( m_data.recordedSamples != NULL );
 	fread( m_data.recordedSamples, 1, fileSize, file );
 	fclose( file );
 }
@@ -69,7 +69,7 @@ void CRecordPlayer::SetData( unsigned long byteSize, const SAMPLE* data )
 	m_data.totalBytes = byteSize;
 	m_data.recordedSamples = ( SAMPLE* )malloc( byteSize );
 
-	assert( m_data.recordedSamples != NULL );
+	//assert( m_data.recordedSamples != NULL );
 	memcpy( m_data.recordedSamples, data, byteSize );
 }
 /*******************************
@@ -95,7 +95,7 @@ int CRecordPlayer::Init()
 	//	fprintf( stderr,"Error:Cannot Initialize Audio\n" );
 	//	return -1;
 	//}
-	SDL_Thread* displaythread = SDL_CreateThread( Display, "dispaly", NULL );
+	//SDL_Thread* displaythread = SDL_CreateThread( Display, "dispaly", NULL );
 	return 0;
 }
 
@@ -149,7 +149,7 @@ int CRecordPlayer::AudioInit()
 }
 
 /*******************************
-**（函数名）StartPlay：
+**（函数名）StartPlay
 **（功能用途）：开始播放音频和显示
 **（返回值）return： 错误标示，0标示正常
 ** (作者)Creator：
@@ -161,6 +161,7 @@ int CRecordPlayer::AudioInit()
 int CRecordPlayer::StartPlay()
 {
 	SDL_Thread* audiothread = SDL_CreateThread( audioPlay,"audio", m_stream );
+	Display(NULL);
 	int lots;
 	SDL_WaitThread( audiothread,&lots );
 	return 0;

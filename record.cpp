@@ -158,7 +158,7 @@ int CRecorder::StartRecord()
 	err = Pa_StartStream( m_Stream );
 	if( err != paNoError )
 		return err;
-	printf("\n=== Now recording!! Please speak into the microphone. ===\n"); fflush(stdout);
+	printf("\n=== Now %ds recording!! Please speak into the microphone. ===\n",m_Info.seconds); fflush(stdout);
 
 	//是否还在录音
 	while( ( err = Pa_IsStreamActive( m_Stream ) ) == 1 )
@@ -190,8 +190,8 @@ int CRecorder::StartRecord()
 
 	average = average / (double)m_Data.maxFrameIndex * m_Info.channels;
 
-	printf("sample max amplitude = %lf\n", max );
-	printf("sample average = %lf\n", average );
+	printf("sample max amplitude = %lf\n", max );fflush(stdout);
+	printf("sample average = %lf\n", average );fflush(stdout);
 
 	//关闭录音设备
 	Pa_Terminate();
@@ -220,7 +220,7 @@ void CRecorder::SavePcm2File( const char* inFile )
 	}
 	if( m_Data.recordedSamples != NULL )
 	{
-		printf( "%d bytes save in %s.\n", m_Data.totalBytes, inFile );
+		printf( "%d bytes save in %s.\n", m_Data.totalBytes, inFile );fflush(stdout);
 		fwrite( m_Data.recordedSamples, 1, m_Data.totalBytes, file );
 	}
 	else

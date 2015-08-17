@@ -7,6 +7,7 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <math.h>
+#include <iostream>
 #include <list>
 using std::list;
 
@@ -144,22 +145,27 @@ void IdelFunction()
 void DisplayFunction()
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	while( !g_dataReady )
-		;
+//	std::cout << __LINE__ << __FUNCTION__ << std::endl;
 	static int count = 0;
-	printf( "%d\n",count++ ); 
-	//进行绘制
-	DrawWaves();
-	//将音频数据存放在list中，方便绘制
-	if( count % 12 == 11 )
+	//printf( "%d\n",count++ ); 
+	//while( !g_dataReady )
+	//	;
+	if( g_dataReady )
 	{
-		if( g_waveList.size() <= g_depth )
+		//进行绘制
+		DrawWaves();
+		//将音频数据存放在list中，方便绘制
+		if( count++ % 12 == 11 )
 		{
-			if( g_waveList.size() == g_depth )
-				g_waveList.pop_back();
-			g_waveList.push_front( g_audioBuffer );
+			if( g_waveList.size() <= g_depth )
+			{
+				if( g_waveList.size() == g_depth )
+					g_waveList.pop_back();
+				g_waveList.push_front( g_audioBuffer );
+			}
 		}
 	}
+
 
 	
 	//if( g_dataReady )
@@ -238,6 +244,7 @@ void DrawWaveOnTop()
 *******************************/
 void DrawWavesOnButton()
 {
+//	std::cout << __LINE__ << __FUNCTION__ << std::endl;
 	GLfloat x = -2.50f, inc = 5.f / FRAME_PER_BUFFER;
 	GLfloat z = 0.0f;
 	GLfloat y = -1.00f;

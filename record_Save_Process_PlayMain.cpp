@@ -16,7 +16,7 @@ int main()
 	rcinfo.framesPerBuffer	= 512;
 	rcinfo.sampleType		= SAMPLE_TYPE_FLOAT32;
 	rcinfo.sampleRate		= 44100;
-	rcinfo.seconds			= 5;
+	rcinfo.seconds			= 10;
 
 	CRecorder recorder( rcinfo );
 	recorder.StartRecord();
@@ -28,40 +28,15 @@ int main()
 	CProcesser pro;
 
 	double scale = 0.0;
-	cout << "变速速率( 0.1 -- 5.0 )：";
+	printf( "变速速率( 0.1 -- 5.0 ):" );fflush(stdout);
 	cin >> scale;
 	int pitch = 0;
-	cout << "音高变化( -10 -- 10 ):";
+	printf( "音高变化( -10 -- 10 ): " ); fflush(stdout);
 	cin >> pitch;
 	float *out = pro.TimeScalingAndPitchShifting( pitch, scale,(float*)recorder.GetData(), recorder.GetDataSize() );
 	bufferSize = pro.GetAfterPitchSize();
 	CRecordPlayer player( bufferSize, out );
 	player.Init();
 	player.StartPlay();
-
-	
-//	//unsigned int bufferSize = recorder.GetDataSize();
-//	//CProcesser pro;
-//	//变速处理
-//	//float* out = pro.TimeScaling( 0.3, (float*)recorder.GetData(), recorder.GetDataSize() );
-//	//bufferSize = pro.GetAfterScaleSize();
-//	//变调处理
-//	float* out = pro.PitchShifting( 6, (float*)recorder.GetData(), recorder.GetDataSize() );
-//	bufferSize = pro.GetAfterPitchSize();
-//
-//#if SAVE_PROCESS_RECORD_TO_WAV
-//	Pcm2WavInfo info;
-//	info.channels	= 1;
-//	info.formatTag	= 3;	//3对应32bit float
-//	info.inFileName = "";
-//	info.outFileName= "pitchout_1_32float_44100.wav";
-//	info.sampleBits = 32;
-//	info.sampleRate = 44100;
-//	pro.Pcm2Wav( out, bufferSize, info );
-//#endif
-//
-//	CRecordPlayer player( bufferSize, out );
-//	player.Init();
-//	player.StartPlay();
 
 }
