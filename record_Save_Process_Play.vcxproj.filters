@@ -62,9 +62,6 @@
     <ClInclude Include="processer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="record16bits.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CAudioTimeScaling.h">
       <Filter>头文件</Filter>
     </ClInclude>

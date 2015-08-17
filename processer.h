@@ -21,10 +21,15 @@ public:
 	float* TimeScaling( float scale,float* buffer, unsigned long bufferSize, int channels = 1, int winSize=1024,
 		int hop = 256
 		);
+	float* PitchShiftingFile( int shift, float* buffer, unsigned long bufferSize, int channels = 1, int winSize=1024,
+		int hop = 256  );
 	float* PitchShifting( int shift, float* buffer, unsigned long bufferSize, int channels = 1, int winSize=1024,
 		int hop = 256  );
+	float* PitchShiftingFile( int shift, const char* filename );
 	unsigned long GetAfterScaleSize(){ return m_audioTimeScalingS.GetSize(); }
+	unsigned long GetAfterPitchSize(){ return m_audioTimeScalingS.GetResampleSize(); }
 	float GetAfterPitchShitingSampleRate(){ return m_audioTimeScalingS.GetSampleRateScale(); }
+
 }; 
 
 #endif

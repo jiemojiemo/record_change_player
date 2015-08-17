@@ -17,6 +17,7 @@ private:
 	complex** STFT(float* dataIn);
 	complex** PVsample(complex** dataIn);
 	float* ISTFT(complex** dataIn);
+	bool Ismiss( int scale );
 
 	unsigned long	m_PCMSize;
 	int				m_hop;
@@ -28,6 +29,7 @@ private:
 	CFFT			m_FFT;
 	CWavread		m_wavread;
 	float			m_sampleRateScale;
+	unsigned long	m_resampleSize;				
 
 public:
 	CAudioTimeSandPitchS();
@@ -38,7 +40,9 @@ public:
 	int		WavWrite(float* dataIn);	
 	float*	wavresample(float * DataIn,int p,int q);
 	unsigned long GetSize(){return m_timeScaleSize*sizeof(float);}
-	float* PitchShifting(float* dataIn,int winSize,int hop,int shift);
+	unsigned long GetResampleSize(){ return m_resampleSize * sizeof(float); }
+	float* PitchShiftingFile(float* dataIn,int winSize,int hop,int shift);
 	float  GetSampleRateScale(){return m_sampleRateScale;}
-
+	float* PitchShifting(float* dataIn,int winSize,int hop,int shift);
+	float* resample(float* dataIn,int scale);
 };

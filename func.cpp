@@ -19,7 +19,7 @@ SAMPLE* g_audioBuffer = NULL;	//存放音频数据的buffer
 SAMPLE* g_copyaudioBuffer = NULL;	//音频数据的副本
 int g_bytes = FRAME_PER_BUFFER * CHANNEL_COUNT * sizeof(SAMPLE);	//要申请空间的大小
 unsigned int g_depth = 32;		//一共有多少音波
-GLfloat g_space = .12f;			//音波之间的间隔
+GLfloat g_space = .10f;			//音波之间的间隔
 GLfloat g_mul	= 3.0f;			//为了凸显音波，一个乘系数
 
 
@@ -290,9 +290,12 @@ void ReshapeFunction( int w, int h )
 	gluPerspective( 45.0, (GLfloat) w / (GLfloat) h, 1.0, 100.0 );
 	//glOrtho( -1.0, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f );
 
-	gluLookAt( 0.0f, .80f, 2.5f , 
+	//gluLookAt( 0.0f, .80f, 2.5f , 
+	//	0.0f, 0.0f, 0.0f, 
+	//	0.0f, 1.0f, 0.0f );
+	gluLookAt( 0.0f, 3.5f * sin( g_eye_y ), 3.5f * cos( g_eye_y ), 
 		0.0f, 0.0f, 0.0f, 
-		0.0f, 1.0f, 0.0f );
+		0.0f, ( cos( g_eye_y ) < 0 ? -1.0f : 1.0f ), 0.0f );
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();

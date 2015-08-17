@@ -25,10 +25,25 @@ float* CProcesser::TimeScaling( float scale,float* buffer, unsigned long bufferS
 	return out;
 }
 
-float* CProcesser::PitchShifting( int shift, float* buffer, unsigned long bufferSize, int channels /* = 1 */,
+float* CProcesser::PitchShiftingFile( int shift, float* buffer, unsigned long bufferSize, int channels /* = 1 */,
+	int winSize/* =1024 */, int hop /* = 256 */ )
+{
+	float* outbuffer = m_audioTimeScalingS.WavReadBuffer( buffer, bufferSize, channels );
+	float* out = m_audioTimeScalingS.PitchShiftingFile( outbuffer, winSize, hop, shift );
+	return out;
+}
+float* CProcesser::PitchShiftingFile( int shift, const char* filename )
+{
+	float* outbuffer = m_audioTimeScalingS.WavReadFile( filename );
+	float* out = m_audioTimeScalingS.PitchShifting( outbuffer, 1024, 256,shift );
+	return out;
+}
+float* CProcesser::PitchShifting( int shift, float* buffer, 
+	unsigned long bufferSize, int channels /* = 1 */, 
 	int winSize/* =1024 */, int hop /* = 256 */ )
 {
 	float* outbuffer = m_audioTimeScalingS.WavReadBuffer( buffer, bufferSize, channels );
 	float* out = m_audioTimeScalingS.PitchShifting( outbuffer, winSize, hop, shift );
 	return out;
+
 }

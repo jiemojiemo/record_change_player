@@ -55,7 +55,23 @@ CRecordPlayer::~CRecordPlayer()
 	}
 }
 
+void CRecordPlayer::SetData( unsigned long byteSize, const SAMPLE* data )
+{
+	if( m_data.recordedSamples != NULL )
+	{
+		free( m_data.recordedSamples );
+		m_data.recordedSamples = NULL;
+	}
 
+
+	m_data.maxFrameIndex = byteSize / sizeof(SAMPLE) / CHANNEL_COUNT;
+	m_data.frameIndex = 0;
+	m_data.totalBytes = byteSize;
+	m_data.recordedSamples = ( SAMPLE* )malloc( byteSize );
+
+	assert( m_data.recordedSamples != NULL );
+	memcpy( m_data.recordedSamples, data, byteSize );
+}
 /*******************************
 **（函数名）StartPlay：
 **（功能用途）：初始化音频设备和opengl

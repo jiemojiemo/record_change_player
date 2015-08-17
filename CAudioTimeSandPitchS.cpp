@@ -1,5 +1,7 @@
 #include "CAudioTimeSandPitchS.h"
 #include <assert.h>
+#include <stdlib.h>
+#include <time.h>
 
 CAudioTimeSandPitchS::CAudioTimeSandPitchS()
 {
@@ -25,6 +27,7 @@ float* CAudioTimeSandPitchS::WavReadFile(const char* filename)
 
 float* CAudioTimeSandPitchS::WavReadBuffer(float* buffer,unsigned long bufferSize,int channel)
 {
+	//暂定32位的录音
 	m_PCMSize = bufferSize/channel/32*8;
 	if(channel==1)
 		return buffer;
@@ -260,7 +263,7 @@ float* CAudioTimeSandPitchS::ISTFT(complex** dataIn)
 
 
 
-float* CAudioTimeSandPitchS::PitchShifting(float* dataIn,int winSize,int hop,int shift)
+float* CAudioTimeSandPitchS::PitchShiftingFile(float* dataIn,int winSize,int hop,int shift)
 {
 	if(shift>19)
 	{
@@ -272,4 +275,111 @@ float* CAudioTimeSandPitchS::PitchShifting(float* dataIn,int winSize,int hop,int
 	m_sampleRateScale=1/scale;
 	return Out;
 
+}
+
+float* CAudioTimeSandPitchS::PitchShifting(float* dataIn,int winSize,int hop,int shift)
+{
+	if(shift>20)
+	{
+		printf("音高调整尺度有误！\n");
+		assert(shift<20);
+	}
+	float scale=(float)(20-shift)/20;
+	float* Out=TimeScaling(dataIn,winSize,hop,scale);
+	Out=resample(Out,shift);
+	return Out;
+
+}
+
+float* CAudioTimeSandPitchS::resample(float* dataIn,int scale)
+{
+
+	if (scale>10)
+	{
+		printf("输入变调参数有误");
+		return 0;
+	}
+
+	int scale_s=scale > 0 ? scale : (0-scale);
+
+
+
+	m_resampleSize=m_timeScaleSize*(20.0-scale)/20.0;
+
+	float* dataOut=new float[m_resampleSize];
+	memset( dataOut, 0, m_resampleSize*sizeof(float) );
+	int a=0;
+	int k;
+	if (scale>0)
+	{
+		if (scale>6)
+		{
+			for (int i=0;i<m_timeScaleSize;i+=20)
+			{
+				for (int j=0;j<20-(10-scale)*2;j+=2)
+				{
+					dataOut[a++]=dataIn[i+j];
+				}
+				for (int k=20-(10-scale)*2;k<20;k++)
+				{
+					dataOut[a++]=dataIn[i+k];
+				}
+
+			}
+
+		}
+		else
+		{
+			for (int i=0;i<m_timeScaleSize;i++)
+			{
+
+				if (!(i%(20/scale_s)))
+				{
+					i++;
+				}
+				dataOut[a++]=dataIn[i];
+				//printf("%d,%d\n",a,i);
+
+			}
+		}
+	}
+
+	else
+	{
+		for (int i=0;i<m_timeScaleSize;i++)
+		{
+			dataOut[a]=dataIn[i];
+			//	printf("a:%d,i%d\n",a,i);
+			int test=(i+1)%(20/scale_s);
+			if (!test)
+			{
+				a=a+1;
+				dataOut[a]=(dataIn[i]+dataIn[i+1])/2.0;
+				//	printf("a:%d,i%d\n",a,i);
+			}
+			a=a+1;
+
+		}
+
+	}
+	fstream f;
+	f.open("D:/1.txt",ios::app);
+	for (int i=0;i<m_resampleSize;i++)
+	{
+		f<<dataOut[i]<<std::endl;
+	}
+
+	return dataOut;
+
+}
+
+bool CAudioTimeSandPitchS::Ismiss( int scale )
+{
+	double rate = double(scale) / 20.0;
+	srand( (unsigned)time(0) );
+	int num = rand() % 100;	//0~99
+
+	if( double(num)/100.0 < rate )
+		return true;
+	return false;
 }

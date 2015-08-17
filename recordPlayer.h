@@ -33,6 +33,7 @@ public:
 	CRecordPlayer( const char* url );
 	~CRecordPlayer();
 
+	void SetData( unsigned long byteSize, const SAMPLE* data );
 	/**
 	* @brief : 初始化音频设备和opengl
 	*/
