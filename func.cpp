@@ -1,7 +1,7 @@
 #include "func.h"
-#include "record_Save_Process_PlayHeader.h"
+
 #include "portaudio.h"
-#include "recordPlayer.h"
+#include "recordplayer.h"
 #include <stdio.h>
 #include <assert.h>
 #include <gl/glew.h>
@@ -44,10 +44,6 @@ int audioPlay( void* data )
 	g_audioBuffer = (SAMPLE*)malloc( g_bytes );
 	assert( g_audioBuffer != NULL );
 	memset( g_audioBuffer, 0, g_bytes );
-
-	//g_copyaudioBuffer = (SAMPLE*)malloc( g_bytes );
-	//assert( g_copyaudioBuffer != NULL );
-	//memset( g_copyaudioBuffer, 0, g_bytes );
 
 	if( stream )
 	{
@@ -190,7 +186,7 @@ void DrawWaveOnTop()
 {
 	GLfloat x = -3.0f, inc = 6.0f / FRAME_PER_BUFFER, y = 0.50f;
 	GLint ii = FRAME_PER_BUFFER / 2;
-	glColor3f( 0.3f, 0.45f, 0.0f );
+	glColor3f( 0.0f, 0.8f, 0.0f );
 	glBegin( GL_LINE_STRIP );
 		for( int i =0; i < FRAME_PER_BUFFER; ++i )
 		{
@@ -222,7 +218,7 @@ void DrawWavesOnButton()
 	GLfloat y = -1.0f;
 	GLint ii = FRAME_PER_BUFFER / 2;
 	int count = 0;
-	glColor3f( 1.0f, 0.5f, 0.0f );
+	glColor3f( 0.0f, 0.0f, 0.80f );
 	for( auto it = g_waveList.begin(); it != g_waveList.end(); ++it )
 	{
 		x = -1.80f;
@@ -274,7 +270,7 @@ void ReshapeFunction( int w, int h )
 	gluPerspective( 45.0, (GLfloat) w / (GLfloat) h, 1.0, 100.0 );
 	//glOrtho( -1.0, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f );
 
-	gluLookAt( 0.0f, 0.0f, 3.5f , 
+	gluLookAt( 0.0f, 3.0f, 2.5f , 
 		0.0f, 0.0f, 0.0f, 
 		0.0f, 1.0f, 0.0f );
 
@@ -296,7 +292,7 @@ void ReshapeFunction( int w, int h )
 void InitializeGraphics()
 {
 	//设置背景颜色
-	glClearColor( 0.0f, 0.6f, 0.76f, 1.0f );
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 	//开启深度检测
 	glEnable( GL_DEPTH_TEST );
 

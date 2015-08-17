@@ -3,7 +3,7 @@
 #include "processer.h"
 #include "recordPlayer.h"
 
-#define SECONDS 1
+#define SAVE_RECORD 0
 
 int main()
 {
@@ -12,12 +12,14 @@ int main()
 	rcinfo.framesPerBuffer	= 512;
 	rcinfo.sampleType		= SAMPLE_TYPE_FLOAT32;
 	rcinfo.sampleRate		= 44100;
-	rcinfo.seconds			= 1;
+	rcinfo.seconds			= 3;
 
 	CRecorder recorder( rcinfo );
 	recorder.StartRecord();
-//	recorder.SavePcm2File( "pcm_2_44100_float_5" );
 
+#if SAVE_RECORD
+	recorder.SavePcm2File( "pcm_2_44100_float_5" );
+#endif
 
 
 	unsigned int bufferSize;
@@ -36,6 +38,8 @@ int main()
 	info.sampleBits = 32;
 	info.sampleRate = 44100;
 	pro.Pcm2Wav( out, bufferSize, info );
+
+
 
 	CRecordPlayer player( bufferSize, out );
 	player.Init();
