@@ -2,7 +2,6 @@
 #define PROCESSER_H
 
 #include "pcm2wav.h"
-#include "CAudioTimeScaling.h"
 #include "CAudioTimeSandPitchS.h"
 
 class CProcesser

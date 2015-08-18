@@ -83,7 +83,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CAudioTimeSandPitchS.cpp" />
-    <ClCompile Include="CAudioTimeScaling.cpp" />
     <ClCompile Include="CFFT.cpp" />
     <ClCompile Include="CWavread.cpp" />
     <ClCompile Include="func.cpp" />
@@ -95,7 +94,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAudioTimeSandPitchS.h" />
-    <ClInclude Include="CAudioTimeScaling.h" />
     <ClInclude Include="CFFT.h" />
     <ClInclude Include="CWavread.h" />
     <ClInclude Include="func.h" />

@@ -33,9 +33,6 @@
     <ClCompile Include="processer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CAudioTimeScaling.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="CFFT.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -43,7 +40,7 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CAudioTimeSandPitchS.cpp">
-      <Filter>头文件</Filter>
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +57,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="processer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CAudioTimeScaling.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CFFT.h">
