@@ -27,6 +27,7 @@ int main()
 	unsigned int bufferSize = recorder.GetDataSize();
 	CProcesser pro;
 
+
 	double scale = 0.0;
 	printf( "变速速率( 0.1 -- 5.0 ):" );fflush(stdout);
 	cin >> scale;
@@ -38,5 +39,6 @@ int main()
 	CRecordPlayer player( bufferSize, out );
 	player.Init();
 	player.StartPlay();
+
 
 }

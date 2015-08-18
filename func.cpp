@@ -22,6 +22,7 @@ int g_bytes = FRAME_PER_BUFFER * CHANNEL_COUNT * sizeof(SAMPLE);	//ÒªÉêÇë¿Õ¼äµÄ´
 unsigned int g_depth = 32;		//Ò»¹²ÓĞ¶àÉÙÒô²¨
 GLfloat g_space = .4f;			//Òô²¨Ö®¼äµÄ¼ä¸ô
 GLfloat g_mul	= 10.0f;			//ÎªÁËÍ¹ÏÔÒô²¨£¬Ò»¸ö³ËÏµÊı
+bool g_running = true;			//ÊÇ·ñ»æÖÆopengl
 
 // light 1 parameters
 GLfloat g_light1_ambient[] = { .2f, .2f, .2f, 1.0f };
@@ -67,6 +68,7 @@ int audioPlay( void* data )
 			return err;
 
 		printf("Done.\n"); fflush(stdout);
+		g_running =false;
 	}
 	if( g_audioBuffer != NULL )
 	{
@@ -89,6 +91,19 @@ int audioPlay( void* data )
 *******************************/
 int Display( void* data )
 {
+	while( g_running )
+	{
+		glutMainLoopEvent();
+		glutPostRedisplay();
+	}
+	//½øÈëopenglÊ±¼äÑ­»·
+	//glutMainLoop();
+
+	return 0;
+}
+
+int DisplayInit()
+{
 	int argc = 1;
 	char *argv[] = {"Display"};
 
@@ -110,9 +125,6 @@ int Display( void* data )
 	glutReshapeFunc( ReshapeFunction );
 	//½øĞĞÒ»Ğ©³õÊ¼»¯
 	InitializeGraphics();
-
-	//½øÈëopenglÊ±¼äÑ­»·
-	glutMainLoop();
 
 	return 0;
 }

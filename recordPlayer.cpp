@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+extern bool g_running;
 
 CRecordPlayer::CRecordPlayer( unsigned long byteSize,const SAMPLE* data )
 {
@@ -90,11 +91,11 @@ int CRecordPlayer::Init()
 		return -1;
 	}
 
-	//if( DisplayInit() != 0 )
-	//{
-	//	fprintf( stderr,"Error:Cannot Initialize Audio\n" );
-	//	return -1;
-	//}
+	if( DisplayInit() != 0 )
+	{
+		fprintf( stderr,"Error:Cannot Initialize Audio\n" );
+		return -1;
+	}
 	//SDL_Thread* displaythread = SDL_CreateThread( Display, "dispaly", NULL );
 	return 0;
 }
@@ -164,6 +165,7 @@ int CRecordPlayer::StartPlay()
 	Display(NULL);
 	int lots;
 	SDL_WaitThread( audiothread,&lots );
+	g_running = false;
 	return 0;
 }
 

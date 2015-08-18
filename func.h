@@ -15,6 +15,7 @@ void DisplayFunction();
 void ReshapeFunction( int w, int h );
 void InitializeGraphics();
 void KeyboradFunction( unsigned char key, int x, int y );
+int DisplayInit();
 
 
 #endif
